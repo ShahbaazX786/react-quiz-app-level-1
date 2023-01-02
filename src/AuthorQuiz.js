@@ -15,20 +15,29 @@ function Hero(){
   );
 }
 
-function Book({title}){
-  return (<div className='answer'>
+function Book({title, onClick}){
+  return (<div className='answer' onClick={()=>{onClick(title);}}>
     <h4>{title}</h4>
   </div>);
 }
 
-function Turn({ author, books }) {
+function answer(highlight){
+  const answer_map={
+    'none':'',
+    'correct':'green',
+    'wrong':'red'
+  };
+  return answer_map[highlight];
+}
+
+function Turn({ author, books, highlight, answerSelected }) {
   return (
-    <div className='row turn' style={{ backgroundColor: 'white' }}>
+    <div className='row turn' style={{ backgroundColor: answer(highlight) }}>
       <div className='col col-lg-4 offset-1'>
         <img src={author.imageUrl} className='authorImage' alt='author' />
       </div>
       <div className='col col-lg-6'>
-        {books.map((title) => <Book title={title} key={title}/>)}
+        {books.map((title) => <Book title={title} key={title} onClick={answerSelected}/>)}
       </div>
     </div>
   );
@@ -52,11 +61,11 @@ function Footer() {
 }
 
 
-function AuthorQuiz({ turnData }) {
+function AuthorQuiz({ turnData, highlight, answerSelected }) {
   return (
     <div className="container">
     <Hero />
-    <Turn {...turnData} />
+    <Turn {...turnData} highlight={highlight} answerSelected={answerSelected} />
     <Continue />
     <Footer />
     </div>

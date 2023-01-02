@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import AuthorQuiz from './AuthorQuiz';
 import reportWebVitals from './reportWebVitals';
+import {shuffle,sample} from 'underscore';
+import { render } from 'express/lib/response';
 
 const authors = [
   {
@@ -44,20 +46,40 @@ const authors = [
     books: ['Hamlet', 'Macbeth', 'Romeo and Juliet']
   }
 ];
-  
+
+
+function getTurnData(authors) {
+  const allBooks = authors.reduce(function (p, c, i) {
+    return p.concat(c.books);
+  }, []);
+  const fourRandomBooks = shuffle(allBooks).slice(0, 4);
+  const answer = sample(fourRandomBooks);
+
+  return {
+    books: fourRandomBooks,
+    author: authors.find((author) => author.books.some((title) => title === answer))
+  }
+}
+
+
   const state={
-    turnData:{
-      author:authors[0],
-      books:authors[0].books
-    }
+    turnData:getTurnData(authors),
+    highlight:''  
   };
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <AuthorQuiz {...state} />
-  </React.StrictMode>
-);
+
+  function answerSelected(answer){
+    const correctanswer = state.turnData.author.books.some((book)=>book === answer);
+    state.highlight = correctanswer?'correct':'wrong';
+    render();
+  }
+  
+function renda() {
+  ReactDOM.render(
+    <AuthorQuiz {...state} answerSelected={answerSelected} />, document.getElementById('root')
+  );
+}
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+renda();
 reportWebVitals();
